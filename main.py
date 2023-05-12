@@ -18,7 +18,6 @@ class Apple:
 
     def draw(self):
         self.parent_screen.blit(self.image, (self.x, self.y))
-        pygame.display.flip()
 
     def generate(self):
         self.x = random.randint(0,S_X//SIZE-1)*SIZE
@@ -54,7 +53,6 @@ class Snake:
         self.parent_screen.blit(head_image, (self.x[0], self.y[0]))
         for i in range(1, self.length):
             self.parent_screen.blit(self.part, (self.x[i], self.y[i]))
-        pygame.display.flip()
 
     def move_left(self):
         self.direction = 'left'
@@ -70,7 +68,6 @@ class Snake:
 
     def remove_tail(self, x, y):
         pygame.draw.rect(self.parent_screen, BACKGROUND_COLOUR, (x, y, SIZE, SIZE))
-        pygame.display.flip()
 
     def walk(self):
         del_x, del_y = self.x[self.length-1], self.y[self.length-1]
