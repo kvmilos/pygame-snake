@@ -20,7 +20,7 @@ class Apple:
         self.parent_screen.blit(self.image, (self.x, self.y))
         pygame.display.flip()
 
-    def move(self):
+    def generate(self):
         self.x = random.randint(0,S_X//SIZE-1)*SIZE
         self.y = random.randint(0,S_Y//SIZE-1)*SIZE
 
@@ -68,7 +68,12 @@ class Snake:
     def move_down(self):
         self.direction = 'down'
 
+    def remove_tail(self, x, y):
+        pygame.draw.rect(self.parent_screen, BACKGROUND_COLOUR, (x, y, SIZE, SIZE))
+        pygame.display.flip()
+
     def walk(self):
+        del_x, del_y = self.x[self.length-1], self.y[self.length-1]
 
         for i in range(self.length-1, 0, -1):
             self.x[i] = self.x[i-1]
@@ -82,6 +87,8 @@ class Snake:
             self.x[0] -= SIZE
         elif self.direction == 'right':
             self.x[0] += SIZE
+        
+        self.remove_tail(del_x, del_y)
         self.draw()
 
 
@@ -127,7 +134,7 @@ class Game:
         if self.is_collision(self.snake.x[0], self.snake.y[0], self.apple.x, self.apple.y):
             self.play_sound('bite.mp3')
             self.snake.increase_length()
-            self.apple.move()
+            self.apple.generate()
         
         # snake colliding with itself
         for i in range(1, self.snake.length):
