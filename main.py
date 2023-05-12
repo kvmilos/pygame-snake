@@ -29,6 +29,10 @@ class Snake:
         self.length = length
         self.parent_screen = parent_screen
         self.part = pygame.image.load("sprites/snake.png").convert()
+        self.head_up = pygame.image.load("sprites/snakeU.png").convert()
+        self.head_down = pygame.image.load("sprites/snakeD.png").convert()
+        self.head_right = pygame.image.load("sprites/snakeR.png").convert()
+        self.head_left = pygame.image.load("sprites/snakeL.png").convert()
         self.x = [SIZE]*length
         self.y = [SIZE]*length
         self.direction = 'down'
@@ -39,8 +43,16 @@ class Snake:
         self.y.append(-1)
     
     def draw(self):
+        head_images = {
+        'up': self.head_up,
+        'down': self.head_down,
+        'right': self.head_right,
+        'left': self.head_left
+    }
         self.parent_screen.fill(BACKGROUND_COLOUR)
-        for i in range(self.length):
+        head_image = head_images[self.direction]
+        self.parent_screen.blit(head_image, (self.x[0], self.y[0]))
+        for i in range(1, self.length):
             self.parent_screen.blit(self.part, (self.x[i], self.y[i]))
         pygame.display.flip()
 
@@ -131,7 +143,7 @@ class Game:
     def show_game_over(self):
         self.screen.fill(BACKGROUND_COLOUR)
         font = pygame.font.SysFont('arial', 30)
-        line1 = font.render(f"Game is over! Your score is {self.snake.length}", True, (0, 0, 0))
+        line1 = font.render(f"Game is over! Your score is {self.snake.length-1}", True, (0, 0, 0))
         self.screen.blit(line1, (200, 300))
         line2 = font.render("To play again press Enter. To exit press Escape!", True, (0, 0, 0))
         self.screen.blit(line2, (200, 350))
@@ -147,7 +159,7 @@ class Game:
 
     def display_score(self):
         font = pygame.font.SysFont('arial', 30)
-        score = font.render(f"Score: {self.snake.length}", True, (0, 0, 0))
+        score = font.render(f"Score: {self.snake.length-1}", True, (0, 0, 0))
         self.screen.blit(score, (100, 100))
 
     def run(self):
