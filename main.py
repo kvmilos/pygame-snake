@@ -4,24 +4,28 @@ import time
 import random
 
 TIME = .15
-SIZE = 20
-S_X = 1200
-S_Y = 800
-BACKGROUND_COLOUR = (102, 255, 178)
+TILE_SIZE = 20
+SCREEN_X = 1200
+SCREEN_Y = 800
+GAME_X = 800
+GAME_Y = 600
+SCREEN_COLOUR = 'lightblue'
+GAME_COLOUR = (102, 255, 178)
+GAME_SCREEN = pygame.Rect((SCREEN_X - GAME_X) /2, (SCREEN_Y - GAME_Y) /2, GAME_X, GAME_Y)
 
 class Apple:
     def __init__(self, parent_screen):
         self.parent_screen = parent_screen
         self.image = pygame.image.load("sprites/apple.png").convert()
-        self.x = SIZE*3
-        self.y = SIZE*3
+        self.x = (SCREEN_X - GAME_X)/2 + random.randint(0,GAME_X//TILE_SIZE-1)*TILE_SIZE
+        self.y = (SCREEN_Y - GAME_Y)/2 + random.randint(0,GAME_Y//TILE_SIZE-1)*TILE_SIZE
 
     def draw(self):
         self.parent_screen.blit(self.image, (self.x, self.y))
 
     def generate(self):
-        self.x = random.randint(0,S_X//SIZE-1)*SIZE
-        self.y = random.randint(0,S_Y//SIZE-1)*SIZE
+        self.x = (SCREEN_X - GAME_X)/2 + random.randint(0,GAME_X//TILE_SIZE-1)*TILE_SIZE
+        self.y = (SCREEN_Y - GAME_Y)/2 + random.randint(0,GAME_Y//TILE_SIZE-1)*TILE_SIZE
 
 class Snake:
     def __init__(self, parent_screen, length):
@@ -32,8 +36,8 @@ class Snake:
         self.head_down = pygame.image.load("sprites/snakeD.png").convert()
         self.head_right = pygame.image.load("sprites/snakeR.png").convert()
         self.head_left = pygame.image.load("sprites/snakeL.png").convert()
-        self.x = [SIZE]*length
-        self.y = [SIZE]*length
+        self.x = [(SCREEN_X - GAME_X)/2 + random.randint(0,GAME_X//TILE_SIZE-1)*TILE_SIZE]*length
+        self.y = [((SCREEN_Y - GAME_Y)/2 + random.randint(0,GAME_Y//(2*TILE_SIZE)-1)*TILE_SIZE)]*length
         self.direction = 'down'
 
     def increase_length(self):
@@ -48,7 +52,8 @@ class Snake:
         'right': self.head_right,
         'left': self.head_left
     }
-        self.parent_screen.fill(BACKGROUND_COLOUR)
+        self.parent_screen.fill(SCREEN_COLOUR)
+        pygame.draw.rect(self.parent_screen, GAME_COLOUR, GAME_SCREEN)
         head_image = head_images[self.direction]
         self.parent_screen.blit(head_image, (self.x[0], self.y[0]))
         for i in range(1, self.length):
@@ -67,7 +72,7 @@ class Snake:
         self.direction = 'down'
 
     def remove_tail(self, x, y):
-        pygame.draw.rect(self.parent_screen, BACKGROUND_COLOUR, (x, y, SIZE, SIZE))
+        pygame.draw.rect(self.parent_screen, GAME_COLOUR, (x, y, TILE_SIZE, TILE_SIZE))
 
     def walk(self):
         del_x, del_y = self.x[self.length-1], self.y[self.length-1]
@@ -77,13 +82,13 @@ class Snake:
             self.y[i] = self.y[i-1]
         
         if self.direction == 'down':
-            self.y[0] += SIZE
+            self.y[0] += TILE_SIZE
         elif self.direction == 'up':
-            self.y[0] -= SIZE
+            self.y[0] -= TILE_SIZE
         elif self.direction == 'left':
-            self.x[0] -= SIZE
+            self.x[0] -= TILE_SIZE
         elif self.direction == 'right':
-            self.x[0] += SIZE
+            self.x[0] += TILE_SIZE
         
         self.remove_tail(del_x, del_y)
         self.draw()
@@ -97,16 +102,18 @@ class Game:
         pygame.mixer.init()
         self.play_background_music()
 
-        self.screen = pygame.display.set_mode((S_X, S_Y))
-        self.screen.fill(BACKGROUND_COLOUR)
+        self.screen = pygame.display.set_mode((SCREEN_X, SCREEN_Y))
+        self.screen.fill(SCREEN_COLOUR)
+        pygame.draw.rect(self.screen, GAME_COLOUR, GAME_SCREEN)
+
         self.snake = Snake(self.screen, 1)
         self.snake.draw()
         self.apple = Apple(self.screen)
         self.apple.draw()
     
     def is_collision(self, x1, y1, x2, y2):
-        if x1 >= x2 and x1 < x2+SIZE:
-            if y1 >= y2 and y1 <y2+SIZE:
+        if x1 >= x2 and x1 < x2+TILE_SIZE:
+            if y1 >= y2 and y1 <y2+TILE_SIZE:
                 return True
             
         return False
@@ -140,12 +147,12 @@ class Game:
                 raise "Game over"
             
         # snake going outside of the screen
-        if not (0 <= self.snake.x[0] <= S_X and 0 <= self.snake.y[0] <= S_Y):
+        if not ((SCREEN_X - GAME_X)/2 <= self.snake.x[0] <= SCREEN_X - (SCREEN_X - GAME_X)/2 and (SCREEN_Y - GAME_Y)/2 <= self.snake.y[0] <= SCREEN_Y - (SCREEN_Y - GAME_Y)/2):
             self.play_sound('lose.wav')
             raise "Hit the boundary"
             
     def show_game_over(self):
-        self.screen.fill(BACKGROUND_COLOUR)
+        self.screen.fill(SCREEN_COLOUR)
         font = pygame.font.SysFont('arial', 30)
         line1 = font.render(f"Game is over! Your score is {self.snake.length-1}", True, (0, 0, 0))
         self.screen.blit(line1, (200, 300))
@@ -164,7 +171,7 @@ class Game:
     def display_score(self):
         font = pygame.font.SysFont('arial', 30)
         score = font.render(f"Score: {self.snake.length-1}", True, (0, 0, 0))
-        self.screen.blit(score, (100, 100))
+        self.screen.blit(score, (70, 100))
 
     def run(self):
         pause = False
