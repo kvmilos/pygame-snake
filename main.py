@@ -37,7 +37,7 @@ class Snake:
         self.head_right = pygame.image.load("sprites/snakeR.png").convert()
         self.head_left = pygame.image.load("sprites/snakeL.png").convert()
         self.x = [(SCREEN_X - GAME_X)/2 + random.randint(0,GAME_X//TILE_SIZE-1)*TILE_SIZE]*length
-        self.y = [((SCREEN_Y - GAME_Y)/2 + random.randint(0,GAME_Y//(2*TILE_SIZE)-1)*TILE_SIZE)]*length
+        self.y = [((SCREEN_Y - GAME_Y)/2 + random.randint(0,GAME_Y//(2*TILE_SIZE))*TILE_SIZE)]*length
         self.direction = 'down'
 
     def increase_length(self):
@@ -147,7 +147,7 @@ class Game:
                 raise "Game over"
             
         # snake going outside of the screen
-        if not ((SCREEN_X - GAME_X)/2 <= self.snake.x[0] <= SCREEN_X - (SCREEN_X - GAME_X)/2 and (SCREEN_Y - GAME_Y)/2 <= self.snake.y[0] <= SCREEN_Y - (SCREEN_Y - GAME_Y)/2):
+        if not ((SCREEN_X - GAME_X)/2 <= self.snake.x[0] < SCREEN_X - (SCREEN_X - GAME_X)/2 and (SCREEN_Y - GAME_Y)/2 < self.snake.y[0] <= SCREEN_Y - (SCREEN_Y - GAME_Y)/2):
             self.play_sound('lose.wav')
             raise "Hit the boundary"
             
